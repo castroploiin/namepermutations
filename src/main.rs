@@ -37,16 +37,19 @@ fn filter_names(
     filtered_names
 }
 
-trait VecDifference {
-    fn difference(&self, rhs: Vec<char>) -> Vec<char>;
+trait SymmetricDifference<T>
+where
+    T: PartialOrd,
+{
+    fn difference(&self, rhs: Vec<(String, String)>) -> Vec<(String, String)>;
 }
 
-impl VecDifference for Vec<char> {
-    fn difference(&self, rhs: Vec<char>) -> Vec<char> {
-        let diffed: Vec<char> = Vec::new();
-        for idx in 0..min(self.len(), &rhs.len()) {
-            if !self.contains[&rhs[idx]] {
-                diffed.push(rhs[idx])
+impl SymmetricDifference<String> for Vec<(String, String)> {
+    fn difference(&self, rhs: Vec<(String, String)>) -> Vec<(String, String)> {
+        let mut diffed: Vec<(String, String)> = Vec::new();
+        for idx in 0..std::cmp::min(self.len(), rhs.len()) {
+            if !self.contains(&rhs[idx]) {
+                diffed.push(rhs[idx].clone())
             }
         }
 
@@ -65,5 +68,6 @@ fn main() {
     }
 
     names_filtered = filter_names(names_filtered, 3);
-    println!("{:?}", names_filtered)
+    println!("{:?}", names_filtered.difference(names_filtered.clone()));
+    // println!("{:?}", names_filtered);
 }
