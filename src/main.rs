@@ -1,4 +1,4 @@
-use std::{collections::HashSet, fs::File, io::Read, path::Path};
+use std::{collections::HashSet, fs::File, io::Read, path::Path, cmp::min};
 
 fn get_names() -> Vec<String> {
     let mut file = File::open(Path::new("src/names.json")).expect("Could not open names.json");
@@ -21,13 +21,13 @@ fn filter_names(
     char_aligned: usize,
 ) -> Vec<(String, String)> {
     let mut filtered_names: Vec<(String, String)> = Vec::new();
-    'outer: for (name1, name2) in permuted_names {
+    'name_roll: for (name1, name2) in permuted_names {
         let chars_name1: Vec<char> = name1.chars().collect();
         let chars_name2: Vec<char> = name2.chars().collect();
 
         for idx in 0..char_aligned {
             if chars_name1[idx] != chars_name2[idx] {
-                break 'outer;
+                break 'name_roll;
             }
         }
 
@@ -41,13 +41,13 @@ trait SymmetricDifference<T>
 where
     T: PartialOrd,
 {
-    fn difference(&self, rhs: Vec<(String, String)>) -> Vec<(String, String)>;
+    fn symmetric_difference(&self, rhs: Vec<(String, String)>) -> Vec<(String, String)>;
 }
 
 impl SymmetricDifference<String> for Vec<(String, String)> {
-    fn difference(&self, rhs: Vec<(String, String)>) -> Vec<(String, String)> {
+    fn symmetric_difference(&self, rhs: Vec<(String, String)>) -> Vec<(String, String)> {
         let mut diffed: Vec<(String, String)> = Vec::new();
-        for idx in 0..std::cmp::min(self.len(), rhs.len()) {
+        for idx in 0..min(self.len(), rhs.len()) {
             if !self.contains(&rhs[idx]) {
                 diffed.push(rhs[idx].clone())
             }
@@ -68,6 +68,9 @@ fn main() {
     }
 
     names_filtered = filter_names(names_filtered, 3);
-    println!("{:?}", names_filtered.difference(names_filtered.clone()));
-    // println!("{:?}", names_filtered);
+    // println!(
+    //     "{:?}",
+    //     names_filtered.symmetric_difference(names_filtered.clone())
+    // );
+    println!("{:?}", names_filtered);
 }
